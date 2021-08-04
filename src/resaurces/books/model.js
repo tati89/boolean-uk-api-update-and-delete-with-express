@@ -43,23 +43,46 @@ function Book() {
     );
   }
 
-  function findOne(id, callback) {
+  async function findOne(id) {
     const sql = `
      SELECT * FROM books
      WHERE id = $1;
      `;
 
-    db.query(sql, [id]).then((result) => callback(result.rows));
+    try {
+      const result = await db.query(sql, [id]);
+      return result.rows;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  function updateOne(id, callback) {
+  async function updateOne(id, newBookData) {
+    //find current book that needs to be updated
+    const currentBook = await findOne(id);
+
+    const newBook = { ...currentBook, ...newBookData };
+
     const sql = `
       UPDATE books
-      SET title = $1
-      WHERE id = $1
+      SET title = $1, type = $2, author = $3, topic = $4
+      WHERE id = $5
 
       RETURNING *;
       `;
+
+    try {
+      const result = await db.query(sql, [
+        newBook.title,
+        newBook.type,
+        newBook.author,
+        newBook.topic,
+        id,
+      ]);
+      return result.rows[0];
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   createATable();
@@ -68,6 +91,7 @@ function Book() {
     createOne,
     getAll,
     findOne,
+    updateOne,
   };
 }
 
