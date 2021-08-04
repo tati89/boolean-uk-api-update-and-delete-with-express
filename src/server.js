@@ -3,6 +3,7 @@ const morgan = require("morgan");
 
 const db = require("./utils/database");
 const booksRouter = require("./resaurces/books/route");
+const petsRouter = require("./resaurces/pets/route");
 
 //Import routes
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 //Test all routes
 app.use("/books", booksRouter);
+app.use("/pets", petsRouter);
 app.get("*", (req, res) => {
   res.json({ msg: "OK" });
 });
